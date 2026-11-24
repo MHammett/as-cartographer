@@ -3,7 +3,7 @@
 usage: python build_topology.py <net-dir>
 
 Inputs in <net>/raw/ (all optional except ps_out/rg_aliases/alive):
-  ps_out.txt          sc_prefixscan:  "<a> <b> <alias>/<len>"  alias is on a's router; alias/b are a link's two ends
+  ps_out*.txt         sc_prefixscan (several files merge):  "<a> <b> <alias>/<len>"  alias is on a's router; alias/b are a link's two ends
   rg_aliases*.txt     sc_radargun -d 1: address pairs sharing an IP-ID counter (same router); several files merge
   alive.txt           live addresses from the sweep (used for the loopback census)
   lbloc.json          [[loopback, last hop before it, n], ...]  from ingest_local.py
@@ -67,7 +67,10 @@ def union(a, b):
         par[max(ra, rb, key=key)] = min(ra, rb, key=key)
 
 links = set()
-for line in (RAW / "ps_out.txt").read_text().splitlines():
+ps_lines = []
+for f in sorted(RAW.glob("ps_out*.txt")):  # several runs (e.g. a later cold start, a link re-test) merge
+    ps_lines += f.read_text().splitlines()
+for line in ps_lines:
     t = line.split()
     if len(t) != 3 or "/" not in t[2]:
         continue
