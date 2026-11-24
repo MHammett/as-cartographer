@@ -22,10 +22,19 @@ rows = json.loads((RAW / "customer_traces.json").read_text())
 out = []
 for c in sorted((c for c in inv if c["asn"] not in FAMILY), key=lambda c: c["asn"]):
     rs = rows.get(str(c["asn"]), [])
+    # One customer edge address is one physical handoff. If traces reach the same edge through different
+    # "last seen" routers, the minority ones are paths where the true attachment router was hidden (MPLS),
+    # so attribute every trace to the router most often seen before that edge. Distinct edges (a customer
+    # with two handoffs) keep their own routers.
+    per_edge = collections.defaultdict(collections.Counter)
+    for r in rs:
+        if r.get("attach") and r.get("next") and not r["attach"].startswith(("opi-space", "own-space")):
+            per_edge[r["next"]][r["attach"]] += 1
+    major = {e: c_.most_common(1)[0][0] for e, c_ in per_edge.items()}
     att = collections.defaultdict(lambda: {"traces": 0, "vps": set(), "edge": collections.Counter()})
     for r in rs:
-        a = r.get("attach")
-        if a and not a.startswith("opi-space"):
+        a = major.get(r.get("next"), r.get("attach"))
+        if a and not a.startswith(("opi-space", "own-space")):
             att[a]["traces"] += 1
             att[a]["vps"].add(r["vp"])
             if r.get("next"):
