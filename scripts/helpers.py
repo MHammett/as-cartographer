@@ -73,16 +73,22 @@ def cmd_cands(outdir, mx=600):
 
 def cmd_pairs(*args):
     """One prefixscan test per far address b, using the hop seen most often before it.
-    Testing every (a, b) combination ran 40+ minutes on a 46-/24 network and found nothing extra."""
+    Testing every (a, b) combination ran 40+ minutes on a 46-/24 network."""
     import collections
     *trs, pf, outf = args
     ns, seen = nets(pf), collections.defaultdict(collections.Counter)
+    # A trace's destination is tested only if radargun already tied it to another address (rg_aliases.txt
+    # in the run directory), i.e. it is a router interface, not an end host. On a 46-/24 network this kept
+    # every router-router link that testing all destinations found, with 343 tests instead of 548.
+    # Dropping destinations entirely lost half of them: sweep traces reach router interfaces as destinations.
+    rg = set()
+    if pathlib.Path("rg_aliases.txt").exists():
+        for line in open("rg_aliases.txt"):
+            rg.update(line.split()[:2])
     for tr in trs:
         for dst, hl in traces(tr):
             for a, b in zip(hl, hl[1:]):
-                # skip the destination itself: it is an end host (customer or loopback), not a router hop,
-                # and testing every destination made this phase run 40+ minutes for nothing
-                if a and b and a != b and b != dst and inside(b, ns):
+                if a and b and a != b and inside(b, ns) and (b != dst or b in rg):
                     seen[b][a] += 1
     pairs = sorted((c.most_common(1)[0][0], b) for b, c in seen.items())
     pathlib.Path(outf).write_text("".join(f"{a} {b}\n" for a, b in pairs))
