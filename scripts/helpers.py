@@ -80,7 +80,9 @@ def cmd_pairs(*args):
     for tr in trs:
         for dst, hl in traces(tr):
             for a, b in zip(hl, hl[1:]):
-                if a and b and a != b and inside(b, ns):
+                # skip the destination itself: it is an end host (customer or loopback), not a router hop,
+                # and testing every destination made this phase run 40+ minutes for nothing
+                if a and b and a != b and b != dst and inside(b, ns):
                     seen[b][a] += 1
     pairs = sorted((c.most_common(1)[0][0], b) for b, c in seen.items())
     pathlib.Path(outf).write_text("".join(f"{a} {b}\n" for a, b in pairs))
