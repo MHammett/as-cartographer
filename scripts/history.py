@@ -64,7 +64,7 @@ for n in ipaddress.collapse_addresses(own):
     while url:
         d = get(url)
         for m in d.get("results", []):
-            if inside(m["target"]) and "netmap" not in (m.get("description") or ""):
+            if inside(m["target"]) and "as-cartographer" not in (m.get("description") or ""):
                 ms[m["id"]] = m
         url = d.get("next")
 hops = collections.defaultdict(lambda: {"first": None, "last": None, "n": 0, "prev": collections.Counter()})

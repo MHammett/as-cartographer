@@ -19,7 +19,7 @@ CITIES = [c.strip() for c in sys.argv[2].split(",") if c.strip()]
 args = sys.argv[3:]
 per_city = int(args[args.index("--per-city") + 1]) if "--per-city" in args else 2  # one probe can sit on an ISP that routes the long way
 API = "https://api.globalping.io/v1/measurements"
-HDR = {"Content-Type": "application/json", "User-Agent": "netmap-skill"}
+HDR = {"Content-Type": "application/json", "User-Agent": "as-cartographer"}
 if os.environ.get("GLOBALPING_TOKEN"):
     HDR["Authorization"] = "Bearer " + os.environ["GLOBALPING_TOKEN"]
 

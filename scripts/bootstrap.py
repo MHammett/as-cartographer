@@ -25,7 +25,7 @@ RAW.mkdir(parents=True, exist_ok=True)
 def get(u, tries=3):
     for i in range(tries):
         try:
-            return json.load(urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "netmap-skill"}), timeout=90))
+            return json.load(urllib.request.urlopen(urllib.request.Request(u, headers={"User-Agent": "as-cartographer"}), timeout=90))
         except Exception:
             time.sleep(2 * (i + 1))
     return {}

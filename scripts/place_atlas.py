@@ -51,7 +51,7 @@ if MODE == "ping":
     inflight = {}
     while q or inflight:
         while q and len(inflight) < n:
-            body = {"definitions": [{"type": "ping", "af": 4, "target": q[0], "packets": 3, "description": "netmap placement", "is_public": True}],
+            body = {"definitions": [{"type": "ping", "af": 4, "target": q[0], "packets": 3, "description": "as-cartographer placement", "is_public": True}],
                     "probes": [{"requested": len(ids), "type": "probes", "value": ",".join(map(str, ids))}], "is_oneoff": True}
             try:
                 m = json.load(urllib.request.urlopen(urllib.request.Request(API, json.dumps(body).encode(), H), timeout=60))["measurements"][0]

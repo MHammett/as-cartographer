@@ -18,7 +18,7 @@ SEED = int(sys.argv[2].upper().lstrip("AS"))
 NAMES = [w.strip().lower() for w in (sys.argv[sys.argv.index("--names") + 1].split(",") if "--names" in sys.argv else []) if w.strip()]
 RAW = NET / "raw"
 RAW.mkdir(parents=True, exist_ok=True)
-UA = {"User-Agent": "netmap-skill", "Accept": "application/rdap+json, application/json"}
+UA = {"User-Agent": "as-cartographer", "Accept": "application/rdap+json, application/json"}
 
 
 def get(u, tries=3):
