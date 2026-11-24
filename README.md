@@ -37,7 +37,7 @@ lessons learned.
 ```
 git clone https://github.com/MHammett/as-cartographer.git ~/.claude/skills/as-cartographer
 ```
-On Windows, use `%USERPROFILE%\.claude\skillss-cartographer`. Claude Code picks the skill up in new
+On Windows, use `%USERPROFILE%\.claude\skills\as-cartographer`. Claude Code picks the skill up in new
 sessions; ask it to "map AS<n>". Keep each network's workspace outside the skill folder, for example
 `~/as-cartographer-work/AS<n>`.
 
