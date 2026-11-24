@@ -18,6 +18,16 @@ _cfg = json.loads((NET / "config.json").read_text())
 FAMILY = set(_cfg.get("asns", [_cfg["asn"]]))
 inv = json.loads((RAW / "customer_inventory.json").read_text())
 rows = json.loads((RAW / "customer_traces.json").read_text())
+# router interfaces from the previous build, to recognise a handoff by its /31-/30 partner
+_topo = NET / "topology.json"
+OWNER = {i: r["id"] for r in json.loads(_topo.read_text())["routers"] for i in r["interfaces"]} if _topo.exists() else {}
+
+
+def mates(ip):
+    import ipaddress
+    n = int(ipaddress.ip_address(ip))
+    out = [n ^ 1] + ([n + 1 if n % 4 == 1 else n - 1] if n % 4 in (1, 2) else [])
+    return [str(ipaddress.ip_address(x)) for x in out]
 
 out = []
 for c in sorted((c for c in inv if c["asn"] not in FAMILY), key=lambda c: c["asn"]):
@@ -31,6 +41,10 @@ for c in sorted((c for c in inv if c["asn"] not in FAMILY), key=lambda c: c["asn
         if r.get("attach") and r.get("next") and not r["attach"].startswith(("opi-space", "own-space")):
             per_edge[r["next"]][r["attach"]] += 1
     major = {e: c_.most_common(1)[0][0] for e, c_ in per_edge.items()}
+    for e in per_edge:  # strongest evidence: the edge's /31-/30 partner is a known interface of a router
+        mate = next((OWNER[m] for m in mates(e) if m in OWNER), None)
+        if mate:
+            major[e] = mate
     att = collections.defaultdict(lambda: {"traces": 0, "vps": set(), "edge": collections.Counter()})
     for r in rs:
         a = major.get(r.get("next"), r.get("attach"))
@@ -48,9 +62,11 @@ for c in sorted((c for c in inv if c["asn"] not in FAMILY), key=lambda c: c["asn
         "name": c["holder"],
         "prefixes": len(c["prefixes"]),
         "other_upstreams": sorted(u for u, _ in c["upstreams"] if u not in FAMILY),
+        # drop stray paths: fewer than 3 traces and under 5% of the customer's attached traces
         "attach": [{"router": k, "traces": v["traces"], "vantage_points": sorted(v["vps"]),
                     "evidence": f"{v['traces']} traces from {len(v['vps'])} vantage point{'s' if len(v['vps']) != 1 else ''}"}
-                   for k, v in sorted(att.items(), key=lambda kv: (-kv[1]["traces"], kv[0]))],
+                   for k, v in sorted(att.items(), key=lambda kv: (-kv[1]["traces"], kv[0]))
+                   if v["traces"] >= 3 or v["traces"] >= 0.05 * sum(x["traces"] for x in att.values())],
         "edge": [e for e, _ in sorted(edge.items(), key=lambda kv: (-kv[1], kv[0]))[:3]],
         "never_via_operator_from": bypass,
         "traces": len(rs),
