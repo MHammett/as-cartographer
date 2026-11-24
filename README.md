@@ -32,15 +32,20 @@ lessons learned.
   - A RIPE Atlas API key, for stage 4b.
   - A Globalping token, for a higher hourly limit.
 
+## Use it as a Claude Code skill
+
+```
+git clone https://github.com/MHammett/as-cartographer.git ~/.claude/skills/as-cartographer
+```
+On Windows, use `%USERPROFILE%\.claude\skillss-cartographer`. Claude Code picks the skill up in new
+sessions; ask it to "map AS<n>". Keep each network's workspace outside the skill folder, for example
+`~/as-cartographer-work/AS<n>`.
+
 ## Quick start
 
 ```
-python scripts/family.py   work/AS64500 AS64500 --names "former brand"      # pick sibling ASNs with the user
-python scripts/bootstrap.py work/AS64500 AS64500 AS64501
-sudo sh scripts/local_discovery.sh work/AS64500                              # about 30-60 min at 100 pps
-python scripts/ingest_local.py  work/AS64500
-python scripts/build_topology.py work/AS64500
-python scripts/render.py        work/AS64500
+python scripts/family.py work/AS64500 AS64500 --names "former brand"   # pick sibling ASNs with the user
+sudo sh scripts/run_all.sh work/AS64500 AS64500 AS64501                # every no-judgment stage, ~45-75 min
 ```
 
 Then add evidence: placement pings, reverse DNS, pins from looking glasses, customers and history (see

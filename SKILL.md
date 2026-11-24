@@ -21,6 +21,32 @@ fills gaps the previous one left, so stop when the question is answered.
 Before starting, ask what the user wants answered. Usually that is "is X connected to Y, and how". A partial
 map from stages 1-3 often answers it.
 
+**Spend tokens only on judgment.** `scripts/run_all.sh <net> AS<n> ...` runs every stage that needs no
+decisions, unattended:
+- bootstrap,
+- local discovery,
+- build,
+- customers,
+- reverse DNS,
+- handoffs,
+- history,
+- render.
+
+Start it in the background and wait for it to finish. It takes about 45-75 minutes, mostly local probing.
+Claude's work is the judgment in between:
+- which ASNs form the family,
+- `config.json` pins and PoP names,
+- placement runs,
+- looking glasses,
+- turning history into tests,
+- recording `extra_evidence.json`.
+
+After any judgment step, rerun from build (`build_topology.py` then `render.py`), not the whole pipeline.
+
+**Ground truth from the user beats inference.** If the user knows where something is ("DynaCom is in
+Naperville", "Express Dial has a microwave link to Big Rock"), test the network against it and then pin
+it in `config.json` with a label saying the location came from the user.
+
 ## Setup (once per machine)
 
 - Python 3 on the host.
@@ -177,7 +203,27 @@ python scripts/customer_attach.py <net>  &&  python scripts/build_customers.py <
 interfaces count as operator routers. For customers that never cross the operator from the local machine
 (they are multihomed), check BGP paths in RIPEstat looking-glass data:
 - if the transit provider's path goes through the operator, use that provider's LG (stage 5),
-- if only IX peers' paths do, use Atlas probes inside those peers (stage 4b).
+- if only IX peers' paths do, use Atlas probes inside those peers (stage 4b),
+- best of all, trace from Atlas probes **inside the operator's own customers**. Their traffic leaves
+  through the operator, and the operator prefers its customer routes, so the trace crosses the operator
+  to every other customer. In the first run this placed the last six customers in one batch. Globalping
+  had no probes in that small operator's cone.
+
+**How each customer connects:**
+
+```
+python scripts/handoffs.py <net> plan && sudo sh scripts/handoff_probe.sh <net> && python scripts/handoffs.py <net> report
+```
+For every customer it reports:
+- the attachment router,
+- the handoff /31 or /30 and which side is whose (IP-ID confirmed where possible),
+- the extra latency past the operator's router: a hint of radio or long haul versus same building,
+- PTR names,
+- the share of the customer's address space that RIS collectors see arriving through the operator.
+
+Low shares mean a multihomed customer that sends most of its space through other upstreams.
+**Negative "extra ms"** means the operator's router answers ICMP more slowly than the customer's edge.
+That is control-plane noise, not distance.
 
 ## What it cannot see
 
@@ -186,6 +232,13 @@ interfaces count as operator routers. For customers that never cross the operato
 - Port speeds, except IX ports as the operator lists them in PeeringDB.
 - Jumbo MTU: path MTU discovery from a host is capped at its own 1500 bytes.
 - Building-level location. Probes give a metro at best.
+- **Location behind a single entry point.** If the operator reaches a region only through one hub, every
+  probe's traffic passes the hub first. Latency then measures distance behind the hub, not geography. A
+  suburban PoP looked identical to downtown, and Texas routers all read "Dallas + 5-18 ms" from 155
+  Texas-area probes. Report the tiers behind the hub, and use names, customers and user knowledge for the
+  town.
+- IPv6-only customers when the operator's IPv6 hops don't answer. A looking glass can show the route
+  entering the operator, but not where it attaches.
 
 Say so in the report.
 
