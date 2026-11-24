@@ -32,9 +32,9 @@ These come from mapping a regional ISP of about 35 routers across a dozen metros
     Check yours first. It changes what traces show, and it makes the probes attributable to someone the
     target knows.
 14. **A hub hides geography.** When an operator reaches a region only through one hub, every external
-    probe's path passes the hub first. A suburban PoP read the same as downtown, and 25 Texas routers read
-    "Dallas + 5-18 ms" from 155 Texas-area probes. Report tiers behind the hub. Get towns from router
-    names (a `brk-gw` PTR named the Big Rock router), from the customers each router serves, and from the
+    probe's path passes the hub first. A suburban PoP read the same as downtown, and 25 routers in one region
+    read "hub + 5-18 ms" from 155 probes across that region. Report tiers behind the hub. Get towns from router
+    names (a three-letter town code in one gateway PTR named its site), from the customers each router serves, and from the
     user.
 15. **Probes inside the operator's customers are the best vantage point.** They placed six multihomed
     customers that no outside trace crossed. Check `asn_v4` for Atlas probes in each customer ASN early.

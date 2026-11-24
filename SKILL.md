@@ -43,8 +43,8 @@ Claude's work is the judgment in between:
 
 After any judgment step, rerun from build (`build_topology.py` then `render.py`), not the whole pipeline.
 
-**Ground truth from the user beats inference.** If the user knows where something is ("DynaCom is in
-Naperville", "Express Dial has a microwave link to Big Rock"), test the network against it and then pin
+**Ground truth from the user beats inference.** If the user knows where something is ("customer X is in
+town Y", "customer Z has a radio link to site W"), test the network against it and then pin
 it in `config.json` with a label saying the location came from the user.
 
 ## Setup (once per machine)
@@ -234,8 +234,8 @@ That is control-plane noise, not distance.
 - Building-level location. Probes give a metro at best.
 - **Location behind a single entry point.** If the operator reaches a region only through one hub, every
   probe's traffic passes the hub first. Latency then measures distance behind the hub, not geography. A
-  suburban PoP looked identical to downtown, and Texas routers all read "Dallas + 5-18 ms" from 155
-  Texas-area probes. Report the tiers behind the hub, and use names, customers and user knowledge for the
+  suburban PoP looked identical to downtown, and a whole region's routers all read "hub + 5-18 ms"
+  from 155 probes spread across that region. Report the tiers behind the hub, and use names, customers and user knowledge for the
   town.
 - IPv6-only customers when the operator's IPv6 hops don't answer. A looking glass can show the route
   entering the operator, but not where it attaches.
