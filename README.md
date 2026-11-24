@@ -1,4 +1,4 @@
-# netmap
+# as-cartographer
 
 Router-level maps of any network, built from the outside: which routers it has, where they are, how they
 link, where its upstreams, IX ports and customers attach, and how its sibling ASNs interconnect.
@@ -83,4 +83,4 @@ It builds and renders a made-up 3-router, 2-ASN network (documentation addresses
 
 ## License
 
-To be decided.
+MIT. See `LICENSE`.

@@ -1,5 +1,5 @@
 ---
-name: network-map
+name: as-cartographer
 description: Map another operator's network (an ASN) at router level from outside, cheapest sources first. Covers the local scamper pipeline (traceroute, IP-ID alias resolution, /31-/30 link mates), free APIs (RIPEstat, PeeringDB, reverse DNS, Globalping), RIPE Atlas, looking glasses, BGP communities, customer attachment and history. Ends in a deterministic map (Graphviz SVG/PDF/PNG and a native Visio .vsdx). Use when asked to map, verify or reverse-engineer an ISP's PoPs, routers, links, upstreams, IX ports or customers, or to check what an operator claims about its network.
 ---
 
