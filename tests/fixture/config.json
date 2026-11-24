@@ -1,0 +1,21 @@
+{
+ "_comment": "Example only. Documentation ASNs (RFC 5398) and address ranges (RFC 5737). Fill in from the real stages.",
+ "asn": 64500,
+ "asns": [64500, 64501],
+ "name": "Example Networks",
+ "loopbacks": ["192.0.2.128/25"],
+ "pins": {
+  "198.51.100.10": ["CHI", "Example IX Chicago"],
+  "203.0.113.1": ["DAL", "Transit provider IC (dal-r1)"]
+ },
+ "placement": {
+  "near_ms": 1.5,
+  "metro_to_pop": {"Kansas City": {"pop": "STL", "max_ms": 6.5, "note": "no St. Louis probe answers"}, "Chicago": {"pop": "CHI"}, "Dallas": {"pop": "DAL"}},
+  "regional": {"Austin": "TX", "Houston": "TX"}
+ },
+ "transit": {"org": "Example Transit AS64511", "far_ptr_suffix": "transit.example", "ic": {"203.0.113.1": "dal-r1"}},
+ "ix_metro": {"Chicago": "CHI", "Dallas": "DAL"},
+ "pops": {"CHI": ["Midwest", "Chicago"], "STL": ["Midwest", "St. Louis"], "DAL": ["Texas", "Dallas"], "TX": ["Texas", "Texas, city not resolved"], "UNK": ["Unknown", "Location unknown"]},
+ "region_order": ["Midwest", "Texas", "Unknown"],
+ "region_fill": {"Texas": "#F1EFE8"}
+}

@@ -1,0 +1,13 @@
+# Network workspaces and measurement data stay out of the repository.
+work/
+networks/
+raw/
+out/
+!tests/fixture/raw/
+*.warts
+*.tgz
+topology.json
+!tests/fixture/topology.json
+__pycache__/
+*.pyc
+.pytest_cache/
